@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Lesson03 - 02 | 倉庫番ゲーム制作</title>
+
+	<style>
+    #main {
+      width: 800px;
+      margin: auto;
+    }
+	</style>
+</head>
+
+<body>
+	<div id="main">
+		<h1>CarryIt</h1>
+		<p>矢印キーで操作します。
+			<br>全ての荷物を目的地に運んでください。
+		</p>
+		<canvas id="canvas" width="800" height="440"></canvas>
+		<img id="imgGoal" src="imgGoal.png" style="display:none">
+		<img id="imgBox" src="imgBox.png" style="display:none">
+		<img id="imgWall" src="imgWall.png" style="display:none">
+		<img id="imgWorker" src="imgWorker.png" style="display:none">
+	</div>
+
+	<script>
+		/*
+		 * グローバル変数
+		 * 全体で使用する定数・変数はここで定義する
+		 */
+		// 描画するマップを定義
+		// 0:通路, 1:目的地, 2:荷物, 3:目的地&荷物, 6:壁
+		const map = [
+			[6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 6, 6, 6, 6, 0, 0, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 6, 6, 6, 6, 2, 0, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 6, 6, 6, 6, 0, 0, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 6, 6, 0, 0, 2, 0, 0, 2, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 6, 6, 0, 6, 0, 6, 6, 6, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 0, 0, 0, 6, 0, 6, 6, 6, 0, 6, 6, 6, 6, 0, 0, 1, 1, 6, 6],
+			[6, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 6, 6],
+			[6, 6, 6, 6, 6, 0, 6, 6, 6, 6, 0, 6, 0, 6, 0, 0, 1, 1, 6, 6],
+			[6, 6, 6, 6, 6, 0, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+			[6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+		];
+
+		// プレイヤーの座標を定義
+		let px = 12, py = 8;
+
+		/*
+		 * 初期化関数
+		 * ページの読み込み完了後に呼び出す関数
+		 */
+		function init() {
+			// イベントハンドラを登録
+			window.onkeydown = function(event) {
+				if (event.keyCode == 37) px--;
+				if (event.keyCode == 38) py--;
+				if (event.keyCode == 39) px++;
+				if (event.keyCode == 40) py++;
+				repaint();
+			}
+
+			// 描画
+			repaint();
+		}
+
+		/*
+		 * イベントハンドラ
+		 * キーボード操作を受け付けたときに呼び出す関数
+		 * 引数のイベントオブジェクトに押されたキー番号が格納されている
+		 */
+		function mykeydown(event) {
+			// 1歩先と2歩先の座標を取得するための変数を準備
+
+			// プレイヤーを動かす前に、1歩先と2歩先の座標を取得する
+
+			// 1歩先が0:通路または1:目的地なら、プレイヤーを進める
+
+			// 1歩先が2:荷物または3:目的地&荷物の場合
+				// 2歩先が0:通路または1:目的地かどうか確かめる
+					// 1歩先の荷物をクリア
+					// 2歩先に荷物を置く
+					// プレイヤーを進める
+			
+			// 再描画
+
+		}
+
+		/*
+		 * 描画関数
+		 * canvas要素にイメージを描画する関数
+		 */
+		function repaint() {
+			// canvas要素のコンテキストを取得
+			const ctx = document.getElementById('canvas').getContext('2d');
+
+			// 背景を黒で塗りつぶす
+			ctx.fillStyle = '#000';
+			ctx.fillRect(0, 0, 800, 440);
+
+			// 座標ごとにイメージを描画
+			for (let y = 0; y < map.length; y++) {
+				for (let x = 0; x < map[y].length; x++) {
+					if (map[y][x] == 1 || map[y][x] == 3) {
+						ctx.drawImage(imgGoal, x * 40, y * 40, 40, 40);
+					}
+					if (map[y][x] == 2 || map[y][x] == 3) {
+						ctx.drawImage(imgBox, x * 40, y * 40, 40, 40);
+					}
+					if (map[y][x] == 6) {
+						ctx.drawImage(imgWall, x * 40, y * 40, 40, 40);
+					}
+				}
+			}
+
+			// プレイヤーのイメージを描画
+			ctx.drawImage(imgWorker, px * 40, py * 40, 40, 40);
+		}
+
+		// ページの読み込み完了後、初期化関数を実行
+		window.onload = init;
+
+	</script>
+</body>
+</html>

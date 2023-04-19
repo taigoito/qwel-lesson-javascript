@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Lesson04 - 02 | キーボード操作でスプライトを動かす1</title>
+  </head>
+  <body>
+    <canvas id="game" width="800" height="600"></canvas>
+    <script>
+      /*
+       * Maze: 迷路クラス
+       * 迷路の2次元配列データを生成・管理・描画する
+       */
+      function Maze() {
+        // 迷路データを格納するメンバ変数を準備
+        this.data = [];
+
+        /*
+         * 迷路を2次元配列データとして自動生成するメソッド
+         * 引数: w:列数, h:行数 （共に奇数を指定すること）
+         */
+        this.create = function(w, h) {
+          // 引数で指定した高さの回数繰り返す
+          for (let y = 0; y < h; y++) {
+            // 列を格納する行を生成
+            this.data[y] = [];
+
+            // 引数で指定した幅の回数繰り返す
+            for (let x = 0; x < w; x++) {
+              // 周囲を1:壁 とし、中は0:通路 とする
+              if (x == 0 || x == w - 1 || y == 0 || y == h - 1) {
+                this.data[y][x] = 1;
+              } else {
+                this.data[y][x] = 0;
+              }
+            }
+          }
+          
+          // 棒倒し法で迷路内に壁を配置
+          for (let y = 2; y < h - 2; y += 2) {
+            for (let x = 2; x < w - 2; x += 2) {
+              // 1マス間隔で壁を配置
+              this.data[y][x] = 1;
+
+              // 0～3の乱数を生成
+              let r = Math.floor(Math.random() * 4);
+              // 乱数に応じて上下左右のどこかに壁を配置
+              if (r == 0) this.data[y][x - 1] = 1;
+              if (r == 1) this.data[y - 1][x] = 1;
+              if (r == 2) this.data[y][x + 1] = 1;
+              if (r == 3) this.data[y + 1][x] = 1;
+            }
+          }
+        }
+
+        /*
+         * 迷路データから、迷路を描画するメソッド
+         */
+        this.draw = function() {
+          // canvas要素のコンテキストを取得する
+          let canvas = document.getElementById('game');
+          let ctx = canvas.getContext('2d');
+
+          // 背景を塗りつぶす
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0, 0, this.data[0].length * 10, this.data.length * 10);
+
+          // 任意の色で"1"の部分を塗りつぶす
+          ctx.fillStyle = 'brown';
+          for (let y = 0; y < this.data.length; y++) {
+            for (let x = 0; x < this.data[y].length; x++) {
+              if (this.data[y][x] == 1) {
+                ctx.fillRect(x * 10, y * 10, 10, 10);
+              }
+            }
+          }
+        }
+      }
+
+      /*
+       * Sprite: スプライトクラス
+       * 画面上を動き回るオブジェクトを管理する
+       */
+      function Sprite() {
+        this.x = 1;
+        this.y = 1;
+        this.color = 'yellow';
+
+        /*
+         * スプライトを自身の位置に描画するメソッド
+         */
+        this.draw = function() {
+          // canvas要素のコンテキストを取得する
+          let canvas = document.getElementById('game');
+          let ctx = canvas.getContext('2d');
+
+          // 円を描く
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x * 10 + 5, this.y * 10 + 5, 5, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+
+      /*
+       * グローバル変数を定義
+       */
+      let maze, player;
+
+      /*
+       * 初期化関数
+       */
+      function init() {
+        // 迷路インスタンスを生成
+        maze = new Maze();
+        maze.create(65, 45);
+
+        // プレイヤーインスタンスを生成
+        player = new Sprite();
+
+        // 60ミリ秒ごとにループ関数を実行させる
+        window.setInterval(loop, 60);
+
+        // キー入力イベントハンドラに関数を登録
+        window.onkeydown = mykeydown;
+      }
+
+      /*
+       * ループ関数
+       * 座標系を計算し、画面を描画する
+       */
+      function loop() {
+        maze.draw();
+        player.draw();
+      }
+
+      /*
+       * キー入力を受け付けたときに実行する関数
+       * 第1引数に押されたキーに対応したキーコードが格納されている
+       */
+       function mykeydown(event) {
+        if (event.keyCode == 37) player.x--;
+        if (event.keyCode == 38) player.y--;
+        if (event.keyCode == 39) player.x++;
+        if (event.keyCode == 40) player.y++;
+      }
+
+      // ページの読み込みが完了したら、初期化関数を実行
+      window.onload = init;
+
+    </script>
+  </body>
+</html>
